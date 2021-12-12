@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+  web_server:
+    image: nginx
+    ports:
+      - 8000:80
+    volumes:
+      - ./html:/usr/share/nginx/html:ro

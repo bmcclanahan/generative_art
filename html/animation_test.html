@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+<body>
+
+<div id="myPlot" style="width:100%;max-width:700px"></div>
+
+<script>
+  let increment = 0.05
+  let rows, columns
+  let basePixels = 10
+  let frameRateDisplay
+  let timeOffset = 0.05
+
+  function setup () {
+    createCanvas(windowWidth, windowHeight)
+    background(0, 0, 0)
+    rows = floor(height / basePixels)
+    columns = floor(width / basePixels)
+  }
+   function draw () {
+    let yOffset = 0
+    for (let y = 0; y < rows; y++) {
+      let xOffset = 0
+      for (let x = 0; x < columns; x++) {
+        let randomGrey = noise(xOffset, yOffset, timeOffset) * 255
+        xOffset += increment
+        noStroke()
+        fill(randomGrey)
+        rect(
+          x * basePixels,
+          y * basePixels,
+          basePixels,
+          basePixels
+        )
+
+
+      }
+      timeOffset += increment * .001
+      yOffset += increment
+    }
+  }
+</script>
+
+</body>
+</html>
