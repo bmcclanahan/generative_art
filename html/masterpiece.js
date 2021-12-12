@@ -1,11 +1,11 @@
-let increment = 0.05
+let increment = 0.2
 let rows, columns
 let basePixels = 10
 let frameRateDisplay
 let timeOffset = 0.1
 
 function setup () {
-  createCanvas(windowWidth, windowHeight)
+  createCanvas(windowWidth, windowHeight, WEBGL)
   background(0, 0, 0)
   rows = floor(height / basePixels)
   columns = floor(width / basePixels)
