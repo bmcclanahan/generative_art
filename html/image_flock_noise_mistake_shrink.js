@@ -144,7 +144,13 @@ Flock.prototype.addBoid = function(b) {
 
 function Boid(x, y) {
   this.acceleration = createVector(0, 0);
-  this.velocity = createVector(random(-1, 1), random(-1, 1));
+  if(init) {
+    this.velocity = createVector(random(-1, 1), random(-1, 1));
+  }
+  else {
+    this.velocity = createVector(random(-.1, .1), random(-.2, -.3));
+  }
+  //this.velocity = createVector(0, 0);
   this.position = createVector(x, y);
   this.r = 3.0;
   this.maxspeed = 3;    // Maximum speed
@@ -233,13 +239,14 @@ Boid.prototype.render = function() {
     initPosOffset += 0.5;
     offset = initPosOffset;
     if(initHeight == targetHeight) {
-      init = true
+      let boidInitOffset = -25
       for (let i = 0; i < 10; i++) {
-        let b = new Boid(width / 2,height / 2);
+        let b = new Boid(width / 2 + boidInitOffset,height / 2 + boidInitOffset);
         flock.addBoid(b);
       }
+      init = true
       sizeTransitionTaget = sizeSlider.value();
-      sizeTransitionDirection = Math.sign(initHeight - sizeTransitionTaget)
+      sizeTransitionDirection = -Math.sign(initHeight - sizeTransitionTaget)
     }
   }
   image(img, Math.floor(offset), Math.floor(offset), image_height, image_height);
