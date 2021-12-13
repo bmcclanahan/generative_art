@@ -10,6 +10,8 @@ cohesionOffset = 1;
 sizeOffset = 2;
 seperationOffset = 3;
 
+let canvasWidth = 900;
+let canvasHeight = 600;
 
 Number.prototype.countDecimals = function () {
     if(Math.floor(this.valueOf()) === this.valueOf()) return 0;
@@ -36,7 +38,7 @@ function setup() {
   noiseSpeedSlider = createSliderWrapper('noise speed', 0, .20, 0.05, 0.01);
   //perlinSlider = createSliderWrapper('perlinSlider', 0, 10, 1, .01);
   //createCanvas(640, 360);
-  createCanvas(900, 600);
+  createCanvas(canvasWidth, canvasHeight);
   createP("Drag the mouse to generate new boids.");
   flock = new Flock();
   // Add an initial set of boids into the system
@@ -88,7 +90,9 @@ function draw() {
 
 // Add a new boid into the System
 function mouseDragged() {
-  flock.addBoid(new Boid(mouseX, mouseY));
+  if(mouseX <= canvasWidth && mouseY <= canvasHeight && mouseX >= 0 && mouseY  >= 0){
+    flock.addBoid(new Boid(mouseX, mouseY));
+  }
 }
 
 // The Nature of Code
