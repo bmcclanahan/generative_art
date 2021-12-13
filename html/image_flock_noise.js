@@ -35,7 +35,8 @@ function setup() {
   sizeSlider = createSliderWrapper('size', 10, 100, 50, 5);
   noiseSpeedSlider = createSliderWrapper('noise speed', 0, .20, 0.05, 0.01);
   //perlinSlider = createSliderWrapper('perlinSlider', 0, 10, 1, .01);
-  createCanvas(640, 360);
+  //createCanvas(640, 360);
+  createCanvas(900, 600);
   createP("Drag the mouse to generate new boids.");
   flock = new Flock();
   // Add an initial set of boids into the system
