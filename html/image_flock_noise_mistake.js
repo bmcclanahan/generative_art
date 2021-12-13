@@ -10,7 +10,7 @@ cohesionOffset = 1;
 sizeOffset = 2;
 seperationOffset = 3;
 
-let canvasWidth = 600;
+let canvasWidth = 900;
 let canvasHeight = 600;
 
 Number.prototype.countDecimals = function () {
@@ -37,6 +37,8 @@ function setup() {
   sizeSlider = createSliderWrapper('size', 10, 100, 50, 5);
   noiseSpeedSlider = createSliderWrapper('noise speed', 0, .20, 0.05, 0.01);
   //perlinSlider = createSliderWrapper('perlinSlider', 0, 10, 1, .01);
+
+  background(img);
 
   //createCanvas(640, 360);
   createCanvas(canvasWidth, canvasHeight);
@@ -84,7 +86,6 @@ function updateSliders(){
 }
 
 function draw() {
-  background(img);
   updateSliders();
   flock.run();
 }
