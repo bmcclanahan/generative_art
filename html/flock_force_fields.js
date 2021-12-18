@@ -1,4 +1,4 @@
-let flock, alignSlider, cohesionSlider, separationSlider;
+let flock, alignSlider, cohesionSlider, separationSlider, circleForce;
 
 
 function createSliderWrapper(name, start, end, startVal, increment){
@@ -15,7 +15,11 @@ function setup() {
   separationSlider = createSliderWrapper('separation', 0, 2, 1.5, 0.1);
   createCanvas(640, 360);
   createP("Drag the mouse to generate new boids.");
-  flock = new Flock();
+  circleForce = new Circle(200, 180, 60)
+  rectangleForce = new Rectangle(500, 0, 50, 640);
+
+  env = new Environment([circleForce, rectangleForce]);
+  flock = new Flock(env);
   // Add an initial set of boids into the system
   for (let i = 0; i < 100; i++) {
     let b = new Boid(width / 2,height / 2);
@@ -25,6 +29,8 @@ function setup() {
 
 function draw() {
   background(51);
+  //circle(circleForce.position.x, circleForce.position.y, 100);
+  //rect(rectangleForce.x, rectangleForce.y, rectangleForce.width, rectangleForce.height);
   flock.run();
 }
 
@@ -40,14 +46,15 @@ function mouseDragged() {
 // Flock object
 // Does very little, simply manages the array of all the boids
 
-function Flock() {
+function Flock(env=null) {
   // An array for all the boids
   this.boids = []; // Initialize the array
+  this.env = env;
 }
 
 Flock.prototype.run = function() {
   for (let i = 0; i < this.boids.length; i++) {
-    this.boids[i].run(this.boids);  // Passing the entire list of boids to each boid individually
+    this.boids[i].run(this.boids, this.env);  // Passing the entire list of boids to each boid individually
   }
 }
 
@@ -71,7 +78,10 @@ function Boid(x, y) {
   this.maxforce = 0.05; // Maximum steering force
 }
 
-Boid.prototype.run = function(boids) {
+Boid.prototype.run = function(boids, env) {
+  if(env !== null){
+    this.applyForce(env.getForce(this));
+  }
   this.flock(boids);
   this.update();
   this.borders();

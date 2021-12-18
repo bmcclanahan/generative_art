@@ -1,5 +1,14 @@
-let flock, alignSlider, cohesionSlider, separationSlider;
+let flock, alignSlider, cohesionSlider, separationSlider, circleForce, noiseSpeedSlider;
 
+
+let alignOffset, cohesionOffset, sizeOffset, seperationOffset;
+alignOffset = 0;
+cohesionOffset = 1;
+sizeOffset = 2;
+seperationOffset = 3;
+
+let mouseCircleCenter, mouseCircleRadius, mouseHollowCircle;
+let mouseCircleActivated = false;
 
 function createSliderWrapper(name, start, end, startVal, increment){
   label = createDiv(`${name} <br>`);
@@ -13,9 +22,17 @@ function setup() {
   alignSlider = createSliderWrapper('align', 0, 2, 1, 0.1);
   cohesionSlider = createSliderWrapper('cohesion', 0, 2, 1, 0.1);
   separationSlider = createSliderWrapper('separation', 0, 2, 1.5, 0.1);
+  noiseSpeedSlider = createSliderWrapper('noise speed', 0, .20, 0.05, 0.01);
   createCanvas(640, 360);
   createP("Drag the mouse to generate new boids.");
-  flock = new Flock();
+  //circleForce = new Circle(200, 180, 60)
+  //hollowCircleForce = new HollowCircle(200, 180, 50, 30)
+  rectangleForce = new Rectangle(500, 0, 50, 640, 0.5, 0.5);
+
+  //env = new Environment([hollowCircleForce, rectangleForce]);
+  //env = new Environment([rectangleForce]);
+  env = new Environment([]);
+  flock = new Flock(env);
   // Add an initial set of boids into the system
   for (let i = 0; i < 100; i++) {
     let b = new Boid(width / 2,height / 2);
@@ -23,14 +40,71 @@ function setup() {
   }
 }
 
+function updateSlider(slider, sliderOffset){
+  let minVal = parseFloat(slider.elt.min)
+  let maxVal = parseFloat(slider.elt.max)
+  let scale = maxVal - minVal
+  let noiseVal = simplex2(sliderOffset, 0) * scale
+  let translatedNoiseVal = noiseVal + minVal
+  slider.value(translatedNoiseVal)
+}
+
+function updateSliders(){
+  offsetScaler = 0.1;
+  let noiseSpeed = noiseSpeedSlider.value();
+  //alignOffset += alignIncrement * offsetScaler;
+  alignOffset += noiseSpeed * offsetScaler;
+  updateSlider(alignSlider, alignOffset);
+
+  //cohesionOffset += cohesionIncrement * offsetScaler;
+  cohesionOffset += noiseSpeed * offsetScaler;
+  updateSlider(cohesionSlider, cohesionOffset);
+
+  //sizeOffset += sizeIncrement * offsetScaler;
+  //sizeOffset += noiseSpeed * offsetScaler;
+  //updateSlider(sizeSlider, sizeOffset);
+
+  //seperationOffset += seperationIncrement * offsetScaler;
+  seperationOffset += noiseSpeed * offsetScaler;
+  updateSlider(separationSlider, seperationOffset);
+}
+
 function draw() {
   background(51);
+  //circle(circleForce.position.x, circleForce.position.y, 100);
+  //rect(rectangleForce.x, rectangleForce.y, rectangleForce.width, rectangleForce.height);
+  //updateSliders();
+  if(mouseCircleActivated){
+    circle(mouseCircleCenter.x, mouseCircleCenter.y, mouseCircleRadius+50);
+  }
   flock.run();
 }
 
 // Add a new boid into the System
 function mouseDragged() {
-  flock.addBoid(new Boid(mouseX, mouseY));
+  //flock.addBoid(new Boid(mouseX, mouseY));
+  mouseCircleRadius = p5.Vector.dist(
+    mouseCircleCenter, createVector(mouseX, mouseY)
+  );
+  mouseHollowCircle.updateRadiuses(mouseCircleRadius + 50, mouseCircleRadius)
+}
+
+
+
+function mousePressed() {
+  console.log("mouse pressed", mouseX, mouseY)
+  let radius2 = 1;
+  mouseHollowCircle = new HollowCircle(mouseX, mouseY, radius2 + 50, radius2)
+  flock.env.addForce(mouseHollowCircle);
+  mouseCircleCenter = createVector(mouseX, mouseY)
+  mouseCircleActivated = true;
+
+}
+
+
+function mouseReleased() {
+  mouseCircleActivated = false;
+  console.log("mouse released", mouseX, mouseY)
 }
 
 // The Nature of Code
@@ -40,14 +114,15 @@ function mouseDragged() {
 // Flock object
 // Does very little, simply manages the array of all the boids
 
-function Flock() {
+function Flock(env=null) {
   // An array for all the boids
   this.boids = []; // Initialize the array
+  this.env = env;
 }
 
 Flock.prototype.run = function() {
   for (let i = 0; i < this.boids.length; i++) {
-    this.boids[i].run(this.boids);  // Passing the entire list of boids to each boid individually
+    this.boids[i].run(this.boids, this.env);  // Passing the entire list of boids to each boid individually
   }
 }
 
@@ -71,7 +146,10 @@ function Boid(x, y) {
   this.maxforce = 0.05; // Maximum steering force
 }
 
-Boid.prototype.run = function(boids) {
+Boid.prototype.run = function(boids, env) {
+  if(env !== null){
+    this.applyForce(env.getForce(this));
+  }
   this.flock(boids);
   this.update();
   this.borders();
