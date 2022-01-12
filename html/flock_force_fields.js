@@ -81,6 +81,7 @@ function Boid(x, y) {
 Boid.prototype.run = function(boids, env) {
   if(env !== null){
     this.applyForce(env.getForce(this));
+    env.drawShapes()
   }
   this.flock(boids);
   this.update();

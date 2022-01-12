@@ -10,6 +10,8 @@ seperationOffset = 3;
 let mouseCircleCenter, mouseCircleRadius, mouseHollowCircle;
 let mouseCircleActivated = false;
 
+let shapes;
+
 function createSliderWrapper(name, start, end, startVal, increment){
   label = createDiv(`${name} <br>`);
   slider = createSlider(start, end, startVal, increment);
@@ -74,9 +76,9 @@ function draw() {
   //circle(circleForce.position.x, circleForce.position.y, 100);
   //rect(rectangleForce.x, rectangleForce.y, rectangleForce.width, rectangleForce.height);
   //updateSliders();
-  if(mouseCircleActivated){
-    circle(mouseCircleCenter.x, mouseCircleCenter.y, mouseCircleRadius+50);
-  }
+  //if(mouseCircleActivated){
+  //  circle(mouseCircleCenter.x, mouseCircleCenter.y, mouseCircleRadius+50);
+  //}
   flock.run();
 }
 
@@ -124,6 +126,7 @@ Flock.prototype.run = function() {
   for (let i = 0; i < this.boids.length; i++) {
     this.boids[i].run(this.boids, this.env);  // Passing the entire list of boids to each boid individually
   }
+  console.log("boid position ", this.boids[0].position)
 }
 
 Flock.prototype.addBoid = function(b) {
@@ -149,6 +152,7 @@ function Boid(x, y) {
 Boid.prototype.run = function(boids, env) {
   if(env !== null){
     this.applyForce(env.getForce(this));
+    env.drawShapes();
   }
   this.flock(boids);
   this.update();

@@ -25,13 +25,19 @@ var Rectangle
     return diff;
   }
 
-  HollowCircle = function (x, y, radius1=200, radius2=150, innerForce=1, outerForce=1) {
+  Circle.prototype.drawShape = function() {
+    console.log("drawing the circle")
+    circle(this.position.x, this.position.y, this.radius + 50);
+  }
+
+  HollowCircle = function (x, y, radius1=200, radius2=150, innerForce=1, outerForce=1, circleForce=1) {
     this.position = createVector(x, y);
     this.radius1 = radius1;
     this.radius2 = radius2;
     this.radiusDiff = this.radius1 - this.radius2;
     this.innerForce = innerForce;
     this.outerForce = outerForce;
+    this.circleForce = circleForce;
   }
 
   HollowCircle.prototype.updateRadiuses = function(radius1, radius2){
@@ -41,23 +47,31 @@ var Rectangle
 
   HollowCircle.prototype.getForce = function(boid){
     let distance = p5.Vector.dist(this.position, boid.position);
-    let diff, outerForceWeight, innerForceWeight;
+    let diff, outerForceWeight, innerForceWeight, circleForce;
     if(distance <= this.radius1){
       outerForceWeight = (distance - this.radius2) / this.radiusDiff;
       innerForceWeight = (this.radius1 -  distance) / this.radiusDiff;
       innerForceDir = p5.Vector.sub(boid.position, this.position).normalize();
       outerForceDir =  p5.Vector.sub(this.position, boid.position).normalize();
+      circleForce = innerForceDir.rotate(HALF_PI).normalize();
       innerForceDir.mult(innerForceWeight);
       innerForceDir.mult(this.innerForce);
       outerForceDir.mult(outerForceWeight);
       outerForceDir.mult(this.outerForce);
-      innerForceDir.add(outerForceDir)
+      circleForce.mult(this.circleForce);
+      innerForceDir.add(outerForceDir);
+      innerForceDir.add(circleForce);
       return innerForceDir;
       //console.log("distnce is ", distance)
     }
     else{
       return createVector(0, 0);
-    }
+    }ß
+  }
+
+  HollowCircle.prototype.drawShape = function() {
+    fill(120, 120, 120 ,50);
+    circle(this.position.x, this.position.y, this.radius2);
   }
 
   Rectangle = function (x, y, width, height, force=1) {
@@ -99,6 +113,16 @@ var Rectangle
 
   Environment.prototype.addForce = function(force) {
     this.forceFields.push(force);
+  }
+
+  Environment.prototype.drawShapes = function() {
+    this.forceFields.forEach(
+      x => {
+        if(x.drawShape !== undefined){
+          x.drawShape();
+        }
+      }
+    )
   }
 
 })();
