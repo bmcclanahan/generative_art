@@ -16,8 +16,10 @@ class Boid {
   float sepNeighDist;
   PVector clusterClusterCenter;
   ForceField forceField;
+  Float[] musicPowers;
+  int frame;
 
-    Boid(float x, float y, PVector circleClr, int imageSize, PVector clusterClusterCtr, ForceField ff) {
+    Boid(float x, float y, PVector circleClr, int imageSize, PVector clusterClusterCtr, ForceField ff, Float [] musicPowersArg) {
     acceleration = new PVector(0, 0);
 
     // This is a new PVector method not yet implemented in JS
@@ -39,6 +41,8 @@ class Boid {
     sepNeighDist = 10;
     clusterClusterCenter = clusterClusterCtr;
     forceField = ff;
+    musicPowers = musicPowersArg;
+    frame = 0;
   }
   
   void setStage(int stg) {
@@ -55,6 +59,7 @@ class Boid {
       borders();
     }
     render();
+    frame += 1;
   }
 
   void applyForce(PVector force) {
@@ -77,9 +82,20 @@ class Boid {
         PVector coh = cohesion(boids);   // Cohesion
        
         // Arbitrarily weight these forces
-        sep.mult(1.8);
+        if(musicPowers[frame] > -300 && stage == 0){
+          sep.mult(10.0);
+        }
+        else {
+          sep.mult(1.8);
+        }
         ali.mult(1.0);
-        coh.mult(1.0);
+        if(musicPowers[frame] > -300 && stage == 0){
+          coh.mult(0.0);
+        }
+        else {
+          coh.mult(1.0);
+        }
+        
         
         // Add the force vectors to acceleration
         applyForce(sep);
